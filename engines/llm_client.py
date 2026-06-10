@@ -26,10 +26,25 @@ class LLMClient:
             "stream": False
         }
 
-        resp = requests.post(self.BASE_URL, json=payload, headers=headers, timeout=120)
-        resp.raise_for_status()
-        data = resp.json()
-        return data["choices"][0]["message"]["content"]
+        import time
+        for attempt in range(3):
+            try:
+                resp = requests.post(self.BASE_URL, json=payload, headers=headers, timeout=180)
+                resp.raise_for_status()
+                data = resp.json()
+                return data["choices"][0]["message"]["content"]
+            except requests.exceptions.Timeout:
+                if attempt < 2:
+                    print(f"  [LLM] 超时，重试 {attempt+2}/3...")
+                    time.sleep(5)
+                else:
+                    raise
+            except requests.exceptions.RequestException as e:
+                if attempt < 2:
+                    print(f"  [LLM] 请求失败: {e}, 重试 {attempt+2}/3...")
+                    time.sleep(3)
+                else:
+                    raise
 
     def __call__(self, system_prompt, user_prompt):
         return self.chat(system_prompt, user_prompt)

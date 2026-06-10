@@ -40,10 +40,11 @@ def run_content_engine(config, db, llm_call=None):
                 niche = n
                 break
 
-        if llm_call:
-            raw_content = llm_call(generator.SYSTEM_PROMPT, generator.build_prompt(kw['keyword'], niche))
-        else:
-            raw_content = f"""## {kw['keyword']} - 选购指南
+        try:
+            if llm_call:
+                raw_content = llm_call(generator.SYSTEM_PROMPT, generator.build_prompt(kw['keyword'], niche))
+            else:
+                raw_content = f"""## {kw['keyword']} - 选购指南
 
 > 本文为AI模板草稿，对接LLM后自动填充。
 
@@ -62,6 +63,14 @@ def run_content_engine(config, db, llm_call=None):
 
 ---
 *来源: {kw.get('source_trend', '默认')}*
+"""
+        except Exception as e:
+            print(f"[内容引擎] LLM调用失败 ({kw['keyword']}): {e}, 使用模板")
+            raw_content = f"""## {kw['keyword']} - 选购指南
+
+> LLM调用暂时失败，本文为模板草稿。
+
+{kw.get('source_trend', '')}
 """
 
         processed_content, products = linker.process_article(raw_content, niche)
