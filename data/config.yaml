@@ -1,0 +1,22 @@
+niches:
+  - 家电
+  - 数码
+  - 健身
+
+lead_cities:
+  - 上海
+  - 北京
+  - 深圳
+
+lead_industries:
+  - 美甲
+  - 美容
+  - 宠物
+  - 餐饮
+
+articles_per_day: 3
+leads_per_city: 5
+
+api:
+  llm_endpoint: ""
+  llm_api_key: ""
