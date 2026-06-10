@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+data/autopilot.db
+data/*.db
+.env
+drafts/articles/*.md
+drafts/leads/*.md

@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
@@ -10,9 +11,10 @@ from engines.lead_engine import run_lead_engine
 class Scheduler:
     """定时任务调度器，串联两个引擎"""
 
-    def __init__(self, config, db):
+    def __init__(self, config, db, llm_client=None):
         self.config = config
         self.db = db
+        self.llm_client = llm_client
 
     def run(self):
         """执行完整的一次营销循环"""
@@ -24,7 +26,7 @@ class Scheduler:
         }
 
         try:
-            articles = run_content_engine(self.config, self.db)
+            articles = run_content_engine(self.config, self.db, llm_call=self.llm_client)
             result['articles_generated'] = articles
         except Exception as e:
             result['errors'].append(f"内容引擎失败: {e}")
@@ -56,10 +58,23 @@ class Scheduler:
 if __name__ == '__main__':
     from engines.config import Config
     from engines.db import Database
+    from engines.llm_client import LLMClient
 
     config = Config('data/config.yaml')
     db = Database()
-    scheduler = Scheduler(config, db)
+
+    api_key = config.get('llm.api_key')
+    if api_key and api_key.startswith('$'):
+        env_match = re.match(r'\$\{(\w+)\}', api_key)
+        if env_match:
+            api_key = os.environ.get(env_match.group(1), '')
+
+    llm = LLMClient(
+        api_key=api_key,
+        model=config.get('llm.model', 'deepseek-ai/DeepSeek-V4-Pro')
+    )
+
+    scheduler = Scheduler(config, db, llm_client=llm)
 
     print("=" * 50)
     print("AI 自动营销系统 v0.1")

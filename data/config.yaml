@@ -17,6 +17,8 @@ lead_industries:
 articles_per_day: 3
 leads_per_city: 5
 
-api:
-  llm_endpoint: ""
-  llm_api_key: ""
+llm:
+  provider: siliconflow
+  endpoint: https://api.siliconflow.cn/v1/chat/completions
+  model: deepseek-ai/DeepSeek-V4-Pro
+  api_key: ${SILICONFLOW_API_KEY}
