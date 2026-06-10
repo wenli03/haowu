@@ -46,7 +46,7 @@ footer{{text-align:center;padding:40px 20px;color:#999;font-size:.85em}}
 </head>
 <body>
 <header>
-  <a href="/"><h1>🛒 好物推荐</h1></a>
+  <a href="./"><h1>🛒 好物推荐</h1></a>
   <p>精选产品评测与选购指南</p>
 </header>
 <div class="container">
@@ -54,7 +54,7 @@ footer{{text-align:center;padding:40px 20px;color:#999;font-size:.85em}}
 <div class="content">
 {content}
 </div>
-<a href="/" class="btn-back">← 返回首页</a>
+<a href="./" class="btn-back">← 返回首页</a>
 </div>
 <footer><p>本站文章由AI辅助生成 | 部分链接含联盟佣金</p></footer>
 </body>
@@ -159,7 +159,7 @@ def generate_index(articles, output_dir='docs'):
         source_trend = a.get('source_trend', '')
         tags_html = ''.join(f'<span class="tag">{k.strip()}</span>' for k in keywords if k.strip())
         card = f'''<div class="article-card">
-  <h2><a href="/articles/{safe_name}.html">{a['title']}</a></h2>
+  <h2><a href="./articles/{safe_name}.html">{a['title']}</a></h2>
   <div class="meta">{date} | {source_trend}</div>
   <div class="excerpt">{excerpt}...</div>
   <div style="margin-top:10px">{tags_html}</div>
