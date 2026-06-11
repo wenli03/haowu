@@ -11,10 +11,11 @@ from engines.lead_engine import run_lead_engine
 class Scheduler:
     """定时任务调度器，串联两个引擎"""
 
-    def __init__(self, config, db, llm_client=None):
+    def __init__(self, config, db, llm_client=None, jd_client=None):
         self.config = config
         self.db = db
         self.llm_client = llm_client
+        self.jd_client = jd_client
 
     def run(self):
         """执行完整的一次营销循环"""
@@ -26,7 +27,7 @@ class Scheduler:
         }
 
         try:
-            articles = run_content_engine(self.config, self.db, llm_call=self.llm_client)
+            articles = run_content_engine(self.config, self.db, llm_call=self.llm_client, jd_client=self.jd_client)
             result['articles_generated'] = articles
         except Exception as e:
             result['errors'].append(f"内容引擎失败: {e}")
@@ -84,7 +85,31 @@ if __name__ == '__main__':
         model=config.get('llm.model', 'deepseek-ai/DeepSeek-V4-Pro')
     )
 
-    scheduler = Scheduler(config, db, llm_client=llm)
+    # 京东联盟客户端（可选，配置后自动启用）
+    jd_client = None
+    jd_key = config.get('jd.app_key')
+    if jd_key and jd_key.startswith('$'):
+        m = re.match(r'\$\{(\w+)\}', jd_key)
+        real_key = os.environ.get(m.group(1), '') if m else ''
+        if real_key:
+            import importlib
+            from engines.jd_union import JDUnionClient
+            jd_secret = config.get('jd.app_secret')
+            jd_site = config.get('jd.site_id')
+            if jd_secret and jd_secret.startswith('$'):
+                m2 = re.match(r'\$\{(\w+)\}', jd_secret)
+                jd_secret = os.environ.get(m2.group(1), '') if m2 else ''
+            else:
+                jd_secret = jd_secret or ''
+            if jd_site and jd_site.startswith('$'):
+                m3 = re.match(r'\$\{(\w+)\}', jd_site)
+                jd_site = os.environ.get(m3.group(1), '') if m3 else ''
+            else:
+                jd_site = jd_site or ''
+            jd_client = JDUnionClient(jd_key, jd_secret, jd_site)
+            print("[调度器] 京东联盟API已连接")
+
+    scheduler = Scheduler(config, db, llm_client=llm, jd_client=jd_client)
 
     print("=" * 50)
     print("AI 自动营销系统 v0.1")

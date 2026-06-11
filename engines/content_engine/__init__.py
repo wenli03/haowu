@@ -5,11 +5,12 @@ from .article_generator import ArticleGenerator
 from .affiliate_linker import AffiliateLinker
 
 
-def run_content_engine(config, db, llm_call=None):
+def run_content_engine(config, db, llm_call=None, jd_client=None):
     """执行完整的内容引擎流程
 
     llm_call: 可选回调 (system_prompt, user_prompt) -> 生成文本
-              为 None 时生成模板草稿
+               为 None 时生成模板草稿
+    jd_client: 可选京东联盟客户端，提供则使用真实佣金链接
     """
     niches = config.get('niches', ['家电', '数码'])
     articles_per_day = config.get('articles_per_day', 3)
@@ -30,7 +31,7 @@ def run_content_engine(config, db, llm_call=None):
     print(f"[内容引擎] 选定 {len(top_keywords)} 个关键词")
 
     generator = ArticleGenerator()
-    linker = AffiliateLinker()
+    linker = AffiliateLinker(jd_client=jd_client)
     generated = 0
 
     for kw in top_keywords:

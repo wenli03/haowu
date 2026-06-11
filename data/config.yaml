@@ -22,3 +22,14 @@ llm:
   endpoint: https://api.siliconflow.cn/v1/chat/completions
   model: deepseek-ai/DeepSeek-V4-Pro
   api_key: ${SILICONFLOW_API_KEY}
+
+jd:
+  app_key: ${JD_APP_KEY}
+  app_secret: ${JD_APP_SECRET}
+  site_id: ${JD_SITE_ID}
+
+amazon:
+  access_key: ${AMZ_ACCESS_KEY}
+  secret_key: ${AMZ_SECRET_KEY}
+  partner_tag: ${AMZ_PARTNER_TAG}
+  region: us
